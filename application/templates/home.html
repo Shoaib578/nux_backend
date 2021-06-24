@@ -1,0 +1,101 @@
+{% extends "base.html"%}
+{% block head%}
+<title>Home</title>
+{% endblock %}
+
+
+{% block body%}
+<center>
+    <br/>
+<h1>Hi, <strong>Admin</strong></h1>
+
+
+
+<br/>
+
+
+<h1>Manage Pending Products</h1>
+
+
+<hr width="50%"/>
+<br/>
+<br/>
+
+<a class='btn btn-danger float-right mr-5'href="{{ url_for('admin.Logout') }}">Logout</a>
+
+<br/>
+<br/>
+<br/>
+<br/>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Title</th>
+      <th scope="col">Description</th>
+      <th scope="col">Product Image1</th>
+      <th scope="col">Product Image2</th>
+      <th scope="col">Product Image3</th>
+      <th scope="col">Category</th>
+      <th scope="col">Condition</th>
+      <th scope="col">Price</th>
+      <th scope="col">Product Location</th>
+      
+      <th scope="col">Confirm</th>
+
+     
+
+    
+
+    
+    </tr>
+  </thead>
+  <tbody>
+   
+ {% for product in products %}
+    <tr>
+      <td>{{product.product_title}}</td>
+      <td>{{product.product_description}}</td>
+      <td>
+
+        <img src={{ url_for('static', filename='product_images/'+ product.product_image1) }} style="width:100px;height:100px;border-radius: 5px;" />
+      </td>
+      <td>
+
+        <img src={{ url_for('static', filename='product_images/'+ product.product_image2) }} style="width:100px;height:100px;border-radius: 5px;" />
+
+      </td>
+      <td>
+        <img src={{ url_for('static', filename='product_images/'+ product.product_image3) }} style="width:100px;height:100px;border-radius: 5px;" />
+
+      </td>
+      <td>{{product.product_category}}</td>
+      <td>{{product.new_or_used}}</td>
+      <td>{{product.price}}</td>
+      <td>{{product.product_location}}</td>
+
+      
+      <td>
+          <a class="btn btn-primary" href="{{ url_for('admin.confirm_product', id=product.product_id) }}">Confirm</a>
+      </td>
+
+     
+
+    </tr>
+   {%  endfor %}
+
+
+    
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+</center>
+{% endblock %}
