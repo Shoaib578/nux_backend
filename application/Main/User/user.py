@@ -241,3 +241,14 @@ def EditProfile():
         return jsonify({'msg':'Succesfully Updated'})
     else:
         return jsonify({'msg':"Coud'nt Found User"})
+
+
+
+def UpdatePassword():
+    user_id = request.form.get('user_id')
+    password = request.form.get('password')
+    hash_password = generate_password_hash(password)
+
+    user = Users.query.filter_by(user_id=user_id).first()
+    user.password = hash_password
+    return jsonify({'msg':'Successfully Update'})

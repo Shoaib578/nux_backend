@@ -104,7 +104,7 @@ class RecentChats(db.Model):
 class RecentChatsSchema(ModelSchema):
     class Meta:
 
-        fields = ('recent_id','user_id','user_name','recent_chat','recent_chat_for','member_since',)
+        fields = ('recent_id','user_id','user_name','recent_chat','recent_chat_for','member_since','profile_pic')
 
 
 
@@ -118,4 +118,4 @@ class Notification(db.Model):
 
 class NotificationsSchema(ModelSchema):
     class Meta:
-        fields = ('user_id','notification_id','notification_txt','created_by','seen','reciever','notification_count','user_name','notifications_count')
+        fields = ('user_id','notification_id','notification_txt','created_by','seen','reciever','notification_count','user_name','notifications_count','profile_pic')

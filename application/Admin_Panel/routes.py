@@ -11,7 +11,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 
 admin  = Blueprint('admin', __name__,template_folder='templates',static_folder='../static')
 
-base_url = 'http://192.168.10.9:5000/'
+base_url = 'https://nux-app.herokuapp.com/'
 
 def remove_file(file, type):
     file_name = file

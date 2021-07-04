@@ -140,3 +140,8 @@ def Delete_Notification():
 @main.route('/delete_msg',methods=['GET'])
 def Delete_Message():
     return message.Delete_msg()
+
+
+@main.route('/update_password',methods=['POST'])
+def UpdatePassword():
+    return user.UpdatePassword()
