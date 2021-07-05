@@ -67,7 +67,8 @@ def RegisterWithEmail():
         member_since = datetime.now().strftime('%Y-%m-%d')
         location = request.form.get('location')
         phone_no = request.form.get('phone_no')
-        user = Users(user_name=user_name, email=email, password=hash_password,member_since=member_since,foreign_logged_in=0,location=location,phone_no=phone_no)
+        token = request.form.get('token')
+        user = Users(user_name=user_name, email=email, password=hash_password,member_since=member_since,foreign_logged_in=0,location=location,phone_no=phone_no,token=token)
         db.session.add(user)
         db.session.commit()
         user = Users.query.filter_by(email=email).first()
@@ -110,6 +111,8 @@ def RegisterWithPhoneNumber():
         
         return jsonify({'msg':'Please Create your Password'})
     elif req_time == '3':
+        token = request.form.get('token')
+
         phone_no = request.form.get('phone_no')
         password = request.form.get('password')
         hash_password = generate_password_hash(password)
@@ -117,7 +120,7 @@ def RegisterWithPhoneNumber():
         user_name = request.form.get('user_name')
         member_since = datetime.now()
         location = request.form.get('location')
-        user = Users(user_name=user_name, email=phone_no, password=hash_password,member_since=member_since,foreign_logged_in=0,location=location)
+        user = Users(user_name=user_name, email=phone_no, password=hash_password,member_since=member_since,foreign_logged_in=0,location=location,token=token)
         db.session.add(user)
         db.session.commit()
         user = Users.query.filter_by(email=phone_no).first()
@@ -147,8 +150,10 @@ def LoginWithFacebook():
         location = request.form.get('location')
         password =  generate_password_hash('default')
         member_since = datetime.now()
+        token = request.form.get('token')
 
-        user = Users(user_name=user_name,location=location,password=password,member_since=member_since,phone_no=phone_no,email=user_name,foreign_logged_in=1)
+
+        user = Users(user_name=user_name,location=location,password=password,member_since=member_since,phone_no=phone_no,email=user_name,foreign_logged_in=1,token=token)
         db.session.add(user)
         db.session.commit()
 
@@ -176,6 +181,9 @@ def LoginWithGoogle():
 
     
     if req_time == '2':
+
+        token = request.form.get('token')
+
         user_name = request.form.get('user_name')
         phone_no = request.form.get('phone_no')
         location = request.form.get('location')
@@ -183,7 +191,7 @@ def LoginWithGoogle():
         email = request.form.get('email')
         member_since = datetime.now()
 
-        user = Users(user_name=user_name,location=location,password=password,member_since=member_since,phone_no=phone_no,email=email,foreign_logged_in=1)
+        user = Users(user_name=user_name,location=location,password=password,member_since=member_since,phone_no=phone_no,email=email,foreign_logged_in=1,token=token)
         db.session.add(user)
         db.session.commit()
 

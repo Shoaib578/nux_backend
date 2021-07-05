@@ -29,10 +29,10 @@ class Users(db.Model,UserMixin):
     phone_no = db.Column(db.String(100))
     descriptions = db.Column(db.String(500))
     profile_pic = db.Column(db.String(200))
-
+    token = db.Column(db.String(200))
 class UsersSchema(ModelSchema):
     class Meta:
-        fields = ('user_id','user_name','email','password','foreign_logged_in','member_since','location','phone_no','descriptions','profile_pic')
+        fields = ('user_id','user_name','email','password','foreign_logged_in','member_since','location','phone_no','descriptions','profile_pic','token')
 
 
 
