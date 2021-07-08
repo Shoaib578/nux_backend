@@ -145,3 +145,8 @@ def Delete_Message():
 @main.route('/update_password',methods=['POST'])
 def UpdatePassword():
     return user.UpdatePassword()
+
+
+@main.route('/delete_account',methods=['GET'])
+def DeleteAccount():
+    return user.DeleteAccount()

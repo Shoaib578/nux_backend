@@ -260,3 +260,11 @@ def UpdatePassword():
     user = Users.query.filter_by(user_id=user_id).first()
     user.password = hash_password
     return jsonify({'msg':'Successfully Update'})
+
+
+
+def DeleteAccount():
+    user_id = request.args.get('user_id')
+    user = Users.query.filter_by(user_id=user_id).first()
+    db.session.delete(user)
+    return jsonify({'msg':'Deleted Succesfully'})
