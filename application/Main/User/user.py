@@ -98,8 +98,13 @@ def RegisterWithPhoneNumber():
         return jsonify({'msg':'Please Create your Password'})
     elif req_time == '2':
         password = request.form.get('password')
-        if check_password_hash(user.password,password):
-            return jsonify({'msg':'logged in'})
+        phone_no = request.form.get('phone_no')
+        user = Users.query.filter_by(email=phone_no).first()
+        if user and check_password_hash(user.password,password):
+
+            users_schema = UsersSchema()
+            user_info = users_schema.dump(user)
+            return jsonify({'msg':'logged in','user':user_info})
         else:
             return jsonify({'msg':'wrong password'})
     
