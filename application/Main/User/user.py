@@ -85,24 +85,10 @@ def RegisterWithPhoneNumber():
 
     phone_no = request.form.get('phone_no')
     req_time = request.form.get('req_time')
+    password = request.form.get('password')
     user = Users.query.filter_by(email=phone_no).first()
-    
-    print(req_time)
-    random_v = 0
-    for rand in random.sample(range(1000, 2000),4):
-        random_v =  rand
- 
-    if  req_time == '1':
 
-        resp = requests.post('https://textbelt.com/text', {
-        'phone': phone_no,
-        'message': f'your verification code is {random_v}',
-        'key': 'textbelt',
-        })
-        print(resp.json())
-        return jsonify({'msg':'Verify','v_code':random_v,'success':resp.json()})
-
-    elif req_time == '2' and  user:
+    if req_time == '2' and  user and check_password_hash(user.password,password):
         users_schema = UsersSchema()
         user_info = users_schema.dump(user)
         return jsonify({'msg':'You are Successfully Registered','user':user_info})
