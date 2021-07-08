@@ -118,7 +118,7 @@ def RegisterWithPhoneNumber():
         user_name = request.form.get('user_name')
         member_since = datetime.now()
         location = request.form.get('location')
-        user = Users(user_name=user_name, email=phone_no, password=hash_password,member_since=member_since,foreign_logged_in=0,location=location,token=token)
+        user = Users(user_name=user_name, email=phone_no, password=hash_password,member_since=member_since,foreign_logged_in=0,location=location,token=token,phone_no=phone_no)
         db.session.add(user)
         db.session.commit()
         user = Users.query.filter_by(email=phone_no).first()
