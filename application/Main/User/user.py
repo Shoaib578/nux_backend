@@ -85,17 +85,24 @@ def RegisterWithPhoneNumber():
 
     phone_no = request.form.get('phone_no')
     req_time = request.form.get('req_time')
-    password = request.form.get('password')
+    
     user = Users.query.filter_by(email=phone_no).first()
 
-    if req_time == '2' and  user and check_password_hash(user.password,password):
+    if req_time == '1' and  user :
         users_schema = UsersSchema()
         user_info = users_schema.dump(user)
-        return jsonify({'msg':'You are Successfully Registered','user':user_info})
-    elif req_time == '2' and not user:
+        return jsonify({'msg':'need a password'})
+    elif req_time == '1' and not user:
         print('Not Signed')
         
         return jsonify({'msg':'Please Create your Password'})
+    elif req_time == '2':
+        password = request.form.get('password')
+        if check_password_hash(user.password,password):
+            return jsonify({'msg':'logged in'})
+        else:
+            return jsonify({'msg':'wrong password'})
+    
     elif req_time == '3':
         token = request.form.get('token')
 
