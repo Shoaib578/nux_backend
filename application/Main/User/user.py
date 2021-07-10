@@ -265,4 +265,5 @@ def DeleteAccount():
     user_id = request.args.get('user_id')
     user = Users.query.filter_by(user_id=user_id).first()
     db.session.delete(user)
+    db.session.commit()
     return jsonify({'msg':'Deleted Succesfully'})
