@@ -7,19 +7,30 @@
 {% block body%}
 <center>
     <br/>
-<h1>Hi, <strong>Admin</strong></h1>
+<h1>Hi, <strong>Admin</strong> </h1>
 
 
 
 <br/>
 
 
-<h1>Manage Pending Products</h1>
+<h1>Manage Pending Ads</h1>
 
 
 <hr width="50%"/>
 <br/>
 <br/>
+
+<form method="POST">
+
+<div class="input-group rounded" style="width: 50%;">
+  <input type="search" name="search" class="form-control rounded" placeholder="Search" aria-label="Search"
+    aria-describedby="search-addon" />
+  
+</div>
+</form>
+
+
 
 <a class='btn btn-danger float-right mr-5'href="{{ url_for('admin.Logout') }}">Logout</a>
 

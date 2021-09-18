@@ -108,6 +108,10 @@ def SeeAnotherUserProfile():
 def QuickSearch():
     return product.QuickSearch()
 
+@main.route('/recreate_ad')
+def Reacreate():
+    return product.Recreate()
+
 
 @main.route('/send_message',methods=['POST'])
 def SendMessage():

@@ -66,7 +66,7 @@ def MyAds():
     
     if want_to_filter == 'false':
 
-        sql = text("SELECT *,(SELECT count(*) FROM favorite_products WHERE   favorite_products.favorite_by="+str(my_id)+" AND favorite_products.product_id=product.product_id ) as is_favorite, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM likes  where likes.product_id=product.product_id and liked_by="+str(my_id)+") as is_liked FROM product LEFT JOIN users on users.user_id=posted_by  WHERE  posted_by="+str(my_id))
+        sql = text("SELECT *,(SELECT count(*) FROM favorite_products WHERE   favorite_products.favorite_by="+str(my_id)+" AND favorite_products.product_id=product.product_id ) as is_favorite,(SELECT count(*) FROM product WHERE status !='sold' AND DATEDIFF(NOW(), posted_date) >=30) as is_expired, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM likes  where likes.product_id=product.product_id and liked_by="+str(my_id)+") as is_liked FROM product LEFT JOIN users on users.user_id=posted_by  WHERE  posted_by="+str(my_id))
         query = db.engine.execute(sql)
         product_schema = ProductSchema(many=True)
         products = product_schema.dump(query)
@@ -87,7 +87,7 @@ def SeeAnotherUserProfile():
 
     if is_loggedin == 'true':
         my_id = request.args.get('my_id')
-        sql = text("SELECT *,(SELECT count(*) FROM favorite_products WHERE   favorite_products.favorite_by="+str(my_id)+" AND favorite_products.product_id=product.product_id ) as is_favorite, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM likes  where likes.product_id=product.product_id and liked_by="+str(my_id)+") as is_liked FROM product LEFT JOIN users on users.user_id=posted_by  WHERE  posted_by="+str(product_owner_id))
+        sql = text("SELECT *,(SELECT count(*) FROM favorite_products WHERE   favorite_products.favorite_by="+str(my_id)+" AND favorite_products.product_id=product.product_id ) as is_favorite,(SELECT count(*) FROM product WHERE status !='sold' AND DATEDIFF(NOW(), posted_date) >=30) as is_expired, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM likes  where likes.product_id=product.product_id and liked_by="+str(my_id)+") as is_liked FROM product LEFT JOIN users on users.user_id=posted_by  WHERE  posted_by="+str(product_owner_id))
         query = db.engine.execute(sql)
         product_schema = ProductSchema(many=True)
         products = product_schema.dump(query)
@@ -122,7 +122,7 @@ def MakeFavorite():
 
 def MyFavorite():
     user_id = request.args.get('user_id')
-    sql = text("SELECT *,(SELECT count(*) FROM favorite_products WHERE  favorite_products.product_id=product.product_id AND favorite_products.favorite_by="+str(user_id)+") as is_favorite, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM likes  where likes.product_id=product.product_id and liked_by="+str(user_id)+") as is_liked FROM favorite_products LEFT JOIN product on product.product_id=favorite_products.product_id WHERE favorite_products.favorite_by="+str(user_id))
+    sql = text("SELECT *,(SELECT count(*) FROM favorite_products WHERE  favorite_products.product_id=product.product_id AND favorite_products.favorite_by="+str(user_id)+") as is_favorite,(SELECT count(*) FROM product WHERE status !='sold' AND DATEDIFF(NOW(), posted_date) >=30) as is_expired, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM likes  where likes.product_id=product.product_id and liked_by="+str(user_id)+") as is_liked FROM favorite_products LEFT JOIN product on product.product_id=favorite_products.product_id WHERE favorite_products.favorite_by="+str(user_id))
     query = db.engine.execute(sql)
     favorite_products_schema = FavoriteProductSchema(many=True)
     products = favorite_products_schema.dump(query)
@@ -147,7 +147,7 @@ def Like_or_Unlike():
 
 def ViewProduct():
     product_id = request.args.get('product_id')
-    get_product_sql = text("SELECT * FROM product LEFT JOIN users on users.user_id=product.posted_by WHERE product_id="+str(product_id))
+    get_product_sql = text("SELECT *,(SELECT count(*) FROM product WHERE status !='sold' AND DATEDIFF(NOW(), posted_date) >=30) as is_expired FROM product LEFT JOIN users on users.user_id=product.posted_by WHERE product_id="+str(product_id))
     get_product_query = db.engine.execute(get_product_sql)
     product_schema = ProductSchema(many=True)
     product = product_schema.dump(get_product_query)
@@ -162,13 +162,13 @@ def RalatedProducts():
     if is_loggedin == 'true':
         my_id = request.args.get('my_id')
         
-        get_products_sql = text("SELECT *,(SELECT count(*) FROM favorite_products WHERE  favorite_products.product_id=product.product_id AND favorite_products.favorite_by="+str(my_id)+") as is_favorite, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM likes  where likes.product_id=product.product_id and liked_by="+str(my_id)+") as is_liked FROM product WHERE  product_category='"+str(product_category)+"' AND product_id !="+str(product_id)+" AND status !='pending' ORDER BY product_id DESC  LIMIT 20")
+        get_products_sql = text("SELECT *,(SELECT count(*) FROM favorite_products WHERE  favorite_products.product_id=product.product_id AND favorite_products.favorite_by="+str(my_id)+") as is_favorite,(SELECT count(*) FROM product WHERE status !='sold' AND DATEDIFF(NOW(), posted_date) >=30) as is_expired, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM likes  where likes.product_id=product.product_id and liked_by="+str(my_id)+") as is_liked FROM product WHERE  product_category='"+str(product_category)+"' AND product_id !="+str(product_id)+" AND status !='pending' ORDER BY product_id DESC  LIMIT 20")
         get_products_query = db.engine.execute(get_products_sql)
         product_schema = ProductSchema(many=True)
         products = product_schema.dump(get_products_query)
         return jsonify({'products': products})
     else:
-        get_products_sql = text("SELECT *,(SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count FROM product WHERE  product_category='"+str(product_category)+"' AND product_id !="+str(product_id)+" AND status !='pending' ORDER BY product_id DESC  LIMIT 20")
+        get_products_sql = text("SELECT *,(SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM product WHERE status !='sold' AND DATEDIFF(NOW(), posted_date) >=30) as is_expired FROM product WHERE  product_category LIKE'%"+str(category)+"%'  AND product_id !="+str(product_id)+" AND status !='pending' ORDER BY product_id DESC  LIMIT 20")
         get_products_query = db.engine.execute(get_products_sql)
         product_schema = ProductSchema(many=True)
         products = product_schema.dump(get_products_query)
@@ -190,6 +190,14 @@ def Mark_as_Sold_or_Unsold():
     db.session.commit()
     return jsonify({'msg':'Successfuly'})
 
+def Recreate():
+    product_id = request.args.get('post_id')
+    print(product_id)
+    post_date = datetime.now()
+    product = Product.query.filter_by(product_id=product_id).first()
+    product.posted_date = post_date.strftime('%Y-%m-%d')
+    db.session.commit()
+    return jsonify({'msg':'Recreated'})
 
 def GetAllAds():
     
@@ -199,7 +207,7 @@ def GetAllAds():
         location = request.args.get('location')
         my_id = request.args.get('my_id')
         if want_to_filter == 'false':
-            products_sql = text("SELECT *,(SELECT count(*) FROM favorite_products WHERE  favorite_products.product_id=product.product_id AND favorite_products.favorite_by="+str(my_id)+") as is_favorite, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM likes  where likes.product_id=product.product_id and liked_by="+str(my_id)+") as is_liked FROM product LEFT JOIN users on users.user_id=posted_by  WHERE  product_location='"+str(location)+"' AND status !='pending'")
+            products_sql = text("SELECT *,(SELECT count(*) FROM favorite_products WHERE  favorite_products.product_id=product.product_id AND favorite_products.favorite_by="+str(my_id)+") as is_favorite,(SELECT count(*) FROM product WHERE status !='sold' AND DATEDIFF(NOW(), posted_date) >=30) as is_expired, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM likes  where likes.product_id=product.product_id and liked_by="+str(my_id)+") as is_liked FROM product LEFT JOIN users on users.user_id=posted_by  WHERE  product_location='"+str(location)+"' AND status !='pending'")
             query = db.engine.execute(products_sql)
             product_schema = ProductSchema(many=True)
             products = product_schema.dump(query)
@@ -207,7 +215,7 @@ def GetAllAds():
         else:
             return jsonify({'products':'Nothing'})
     else:
-        products_sql = text("SELECT *,(SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count FROM product LEFT JOIN users on users.user_id=posted_by  WHERE  status !='pending'")
+        products_sql = text("SELECT *,(SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM product WHERE status !='sold' AND DATEDIFF(NOW(), posted_date) >=30) as is_expired FROM product LEFT JOIN users on users.user_id=posted_by  WHERE  status !='pending'")
         query = db.engine.execute(products_sql)
         product_schema = ProductSchema(many=True)
         products = product_schema.dump(query)
@@ -223,13 +231,13 @@ def QuickSearch():
 
     if is_loggedin == 'true':
         my_id = request.args.get('my_id')
-        product_sql = text("SELECT *,(SELECT count(*) FROM favorite_products WHERE  favorite_products.product_id=product.product_id AND favorite_products.favorite_by="+str(my_id)+") as is_favorite, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM likes  where likes.product_id=product.product_id and liked_by="+str(my_id)+") as is_liked FROM product LEFT JOIN users on users.user_id=posted_by  WHERE  product_location='"+str(location)+"' AND product_category='"+str(category)+"' AND status !='pending'")
+        product_sql = text("SELECT *,(SELECT count(*) FROM favorite_products WHERE  favorite_products.product_id=product.product_id AND favorite_products.favorite_by="+str(my_id)+") as is_favorite,(SELECT count(*) FROM product WHERE status !='sold' AND DATEDIFF(NOW(), posted_date) >=30) as is_expired, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM likes  where likes.product_id=product.product_id and liked_by="+str(my_id)+") as is_liked FROM product LEFT JOIN users on users.user_id=posted_by  WHERE  product_location='"+str(location)+"' AND product_category LIKE'%"+str(category)+"%' OR product_title LIKE'%"+str(category)+"%' AND status !='pending' ")
         product_query = db.engine.execute(product_sql)
         product_schema = ProductSchema(many=True)
         products = product_schema.dump(product_query)
         return jsonify({'products':products})
     else:
-        product_sql = text("SELECT *, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count FROM product LEFT JOIN users on users.user_id=posted_by  WHERE  product_location='"+str(location)+"' AND product_category='"+str(category)+"' AND status !='pending'")
+        product_sql = text("SELECT *, (SELECT count(*) from likes where likes.product_id=product.product_id) as likes_count,(SELECT count(*) FROM product WHERE status !='sold' AND DATEDIFF(NOW(), posted_date) >=30) as is_expired FROM product LEFT JOIN users on users.user_id=posted_by  WHERE  product_location='"+str(location)+"' AND product_category LIKE'%"+str(category)+"%' OR product_title LIKE'%"+str(category)+"%' AND status !='pending'")
         product_query = db.engine.execute(product_sql)
         product_schema = ProductSchema(many=True)
         products = product_schema.dump(product_query)

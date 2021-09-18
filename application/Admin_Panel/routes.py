@@ -1,6 +1,7 @@
 from flask import Blueprint,jsonify,request,render_template,redirect,flash,url_for,request
-from application.Main.models import Product,AdminUser
+from application.Main.models import Product,AdminUser,AdminUsersSchema,ProductSchema
 from application import db,app
+from werkzeug.security import generate_password_hash,check_password_hash
 
 from werkzeug.utils import secure_filename
 import os
@@ -23,15 +24,27 @@ def remove_file(file, type):
 @admin.route('/',methods=['GET','POST'])
 @login_required
 def Home():
-    if AdminUser.query.count() == 0:
-        admin = AdminUser(email='theadmin21@gmail.com',password='Games')
+    hash_pw = generate_password_hash('adminnux26')
+    if AdminUser.query.filter_by(category='Admin').count()==1:
+
+        pass
+    else:
+        
+        admin = AdminUser(email='theadmin21nux@gmail.com',password=hash_pw,category='Admin')
         db.session.add(admin)
         db.session.commit()
-    else:
-        pass
+        
+    if request.method == 'POST':
+        search = request.form.get('search')
+        print(search)
+        pending_products_query = text("SELECT * FROM product WHERE product_category LIKE '%"+str(search)+"%' OR product_title LIKE '%"+str(search)+"%' OR product_description LIKE '%"+str(search)+"%' AND status='pending'")
+        pending_products = db.engine.execute(pending_products_query)
+        return render_template('home.html',products=pending_products,base_url=base_url)
 
-
-    pending_products = Product.query.filter_by(status='pending').all()
+ 
+    pending_products_query = text("SELECT * FROM product WHERE  status='pending'")
+    pending_products = db.engine.execute(pending_products_query)
+   
 
     return render_template('home.html',products=pending_products,base_url=base_url)
 
@@ -39,14 +52,18 @@ def Home():
 
 @admin.route('/login',methods=['GET', 'POST'])
 def Login():
-    if AdminUser.query.count() == 0:
-        admin = AdminUser(email='theadmin21@gmail.com',password='Games')
+    hash_pw = generate_password_hash('adminnux26')
+
+    if AdminUser.query.filter_by(category='Admin').count()==1:
+
+        pass
+    else:
+        
+        admin = AdminUser(email='theadmin21nux@gmail.com',password=hash_pw,category='Admin')
         db.session.add(admin)
         db.session.commit()
-    else:
-        pass
-
-
+        
+  
     if current_user.is_authenticated:
         return redirect(url_for('admin.Home'))
     form = LoginForm()
@@ -54,7 +71,7 @@ def Login():
     user = AdminUser.query.filter_by(email=form.email.data).first()
 
     
-    if user and user.password == form.password.data:
+    if user and check_password_hash(user.password,form.password.data):
         
         login_user(user, False)
         return redirect(url_for('admin.Home'))
